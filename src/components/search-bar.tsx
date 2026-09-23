@@ -1,22 +1,35 @@
 import { useState, useEffect, useRef } from "react";
-import { SearchIcon } from "lucide-react";
+import useDebounce from "@/hooks/useDebounce";
+import { useWeatherStore } from "@/store/store";
 
+import { SearchIcon, LoaderCircle } from "lucide-react";
 
 const Searchbar = () => {
   const [query, setQuery] = useState<string>('');
 	const [isOpen, setIsOpen] = useState(false);
 	const [activeIndex, setActiveIndex] = useState(-1);
-	const dummyArray = ['panchkula', 'chandigarh', 'manali', 'delhi'];
-	const error = false;
+	const debouncedQuery = useDebounce(query, 600);
+
+	const getGeodata = useWeatherStore(state => state.getGeoData);
+	const geoData = useWeatherStore(state => state.cityList);
+	const geoError = useWeatherStore(state => state.geoDataError);
+	const isGeoDataLoading = useWeatherStore(state => state.isGeoDataLoading);
+	const clearGeoError = useWeatherStore(state => state.clearGeoError);
 
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const inputRef = useRef<HTMLInputElement | null>(null);
+	const skipFetchRef = useRef<boolean>(false);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
-		setQuery(value);
-		setIsOpen(true);
-		setActiveIndex(-1);
+		skipFetchRef.current = false;
+		setQuery(e.target.value);
+
+		if (geoError) clearGeoError();
+
+		if (geoData.length === 0) {
+			setIsOpen(false);
+			setActiveIndex(-1);
+		}
 	};
 
 	const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -25,18 +38,19 @@ const Searchbar = () => {
 		switch(e.key) {
 			case 'ArrowDown': 
 				e.preventDefault();
-				setActiveIndex(prev => prev < dummyArray.length - 1 ? prev + 1 : 0 );
+				setActiveIndex(prev => prev < geoData.length - 1 ? prev + 1 : 0 );
 				break;
 			
 			case 'ArrowUp':
 				e.preventDefault();
-				setActiveIndex(prev => prev > 0 ? prev - 1 : dummyArray.length - 1);
+				setActiveIndex(prev => prev > 0 ? prev - 1 : geoData.length - 1);
 				break;
 			
 			case 'Enter':
 				e.preventDefault();
 				if (activeIndex >= 0) {
-					setQuery(dummyArray[activeIndex]);
+					skipFetchRef.current = true;
+					setQuery(geoData[activeIndex].name);
 					setActiveIndex(-1);
 					setIsOpen(false);
 				}
@@ -45,14 +59,16 @@ const Searchbar = () => {
 			case 'Escape':
 				e.preventDefault();
 				setQuery('');
-				if (!query) inputRef.current?.blur();
+				if (!query) {
+					inputRef.current?.blur();
+					setIsOpen(false);
+					setActiveIndex(-1);
+				};
 				break;
 
 			default:
 				break;
-
 		}
-
 	};
 
   useEffect(() => {
@@ -66,6 +82,19 @@ const Searchbar = () => {
 		
 		return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+		if (skipFetchRef.current) {
+			skipFetchRef.current = false;
+			return;
+		};
+
+		if (debouncedQuery) {
+			setIsOpen(true);
+			setActiveIndex(-1);
+			getGeodata(debouncedQuery);
+		};
+  }, [debouncedQuery]);
 
   return (
     <div 
@@ -86,11 +115,7 @@ const Searchbar = () => {
 					onChange={handleChange}
 					onKeyDown={handleKeydown}
 					onFocus={() => {
-						if (dummyArray.length > 0) setIsOpen(true);
-					}}
-					onBlur={() => {
-						setIsOpen(false);
-						setActiveIndex(-1);						
+						if (geoData.length > 0) setIsOpen(true);
 					}}
 					role="combobox"
 					aria-expanded={isOpen}
@@ -102,32 +127,51 @@ const Searchbar = () => {
 
 			{ isOpen && (
 				<div 
-					className="w-full h-auto p-1 bg-card top-[120%] left-0 absolute flex shadow-lg rounded-lg border border-neutral-200 dark:border-neutral-700"
+					className="w-full h-auto p-1 bg-card top-[120%] left-0 absolute flex flex-col shadow-lg rounded-lg border border-neutral-200 dark:border-neutral-700"
 				>
+				
+				{ isGeoDataLoading && (
+					<span 
+						className="w-full p-1 rounded-sm text-sm flex items-center justify-center gap-1.5"
+					>
+						<LoaderCircle size={18} className="animate-spin" />
+						Searching...
+					</span>
+					)
+				}
 
-				{ error && <span className="w-full p-1 rounded-sm text-center text-sm">{error}</span>}
+				{ geoError && <p className="w-full p-1 rounded-sm text-sm flex grow items-center justify-center">{geoError}</p>}
 
-				<ul 
-					id="suggestion-list"
-					role="listbox"
-					className="w-full flex flex-col gap-1 rounded-lg"
-				>
-					{ dummyArray.map((itm, idx) => {
-						return (
-							<li
-								key={idx}
-								id={`suggestion-item-${itm}`} 
-								role="option"
-								aria-selected={idx === activeIndex}
-								onMouseOver={() => setActiveIndex(idx)}
-								onMouseLeave={() => setActiveIndex(-1)}
-								className={`w-full py-1 px-1.5 flex items-center capitalize justify-start gap-1.5 rounded-sm cursor-pointer ${idx === activeIndex ? 'bg-neutral-300/50 dark:bg-neutral-700' : ''}`}
-							>
-								{itm}
-							</li>
-						)
-					})}
-				</ul>
+				{ (!isGeoDataLoading && !geoError) && (
+					<ul 
+						id="suggestion-list"
+						role="listbox"
+						className="w-full flex flex-col gap-1 rounded-lg"
+					>
+						{ geoData.map((itm, idx) => {
+							return (
+								<li
+									key={idx}
+									id={`suggestion-item-${itm}`} 
+									role="option"
+									aria-selected={idx === activeIndex}
+									onClick={() => {
+										skipFetchRef.current = true;
+										setQuery(itm.name);
+										setIsOpen(false);
+										setActiveIndex(-1);
+									}}
+									onMouseOver={() => setActiveIndex(idx)}
+									onMouseLeave={() => setActiveIndex(-1)}
+									className={`w-full py-1 px-1.5 flex items-center capitalize justify-start gap-1.5 rounded-sm cursor-pointer ${idx === activeIndex ? 'bg-neutral-300/50 dark:bg-neutral-700' : ''}`}
+								>
+									{`${itm.name}, ${itm.admin1}, ${itm.country}`}
+								</li>
+							)
+						}
+					)}
+					</ul>)
+				}
 				</div>
 			)}
     </div>
