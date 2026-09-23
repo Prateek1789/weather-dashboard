@@ -1,5 +1,5 @@
 import type { StateCreator } from "zustand";
-import type { City, GeoDataError } from "@/types/geocoding.types";
+import type { GeoResponse, City } from "@/types/geocoding.types";
 
 let abortController: AbortController | null = null;
 
@@ -9,6 +9,7 @@ export interface GeoDataSlice {
   geoDataError: string;
   prevQuery: string;
   getGeoData: (query: string) => void;
+	clearGeoError: () => void;
 };
 
 export const createGeoDataSlice: StateCreator<GeoDataSlice> = (set) => ({
@@ -16,6 +17,9 @@ export const createGeoDataSlice: StateCreator<GeoDataSlice> = (set) => ({
   isGeoDataLoading: false,
   geoDataError: '',
   prevQuery: '',
+	clearGeoError: () => {
+		set(({ geoDataError: '' }));
+	},
   getGeoData: async (query) => {
     if (abortController) {
       abortController.abort();
@@ -26,7 +30,7 @@ export const createGeoDataSlice: StateCreator<GeoDataSlice> = (set) => ({
       return;
     };
 
-    set(({ prevQuery: query, isGeoDataLoading: true, }));
+		set(({ isGeoDataLoading: true, geoDataError: '' }));
     abortController = new AbortController();
     const { signal } = abortController;
 
@@ -36,12 +40,12 @@ export const createGeoDataSlice: StateCreator<GeoDataSlice> = (set) => ({
 				{ signal }
       );
 
-			if (!response.ok) {
-				const error: GeoDataError = await response.json();
-				throw new Error(error.reason || 'Failed to fetch'); 
+			const data: GeoResponse = await response.json();
+
+			if (!data.results || data.results.length === 0) {
+				throw new Error('No locations found.'); 
 			};
 
-			const data = await response.json();
 			set(({ cityList: data.results ?? [], isGeoDataLoading: false, geoDataError: '' }));
     }
     catch (err: any) {
