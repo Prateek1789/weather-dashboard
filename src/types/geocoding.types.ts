@@ -9,6 +9,10 @@ export interface City {
     admin2: string
 };
 
+export interface GeoResponse {
+    results: City[];
+};
+
 export interface GeoDataError {
     error: boolean;
     reason: string;
