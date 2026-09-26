@@ -1,0 +1,127 @@
+import type { 
+	AQIResponse,
+	WeatherResponse,
+	WeatherData
+ } from "@/types/weather.types";
+
+/* ---- Formatters ---- */
+
+export const toFehrenheit = (c: number) => Math.round((c * 1.8) + 32);
+export const toMph = (k: number) => Math.round(k * 0.621371);
+export const toInches = (mm: number) => Math.round(mm / 25.4);
+export const toIofM = (num: number) => num * 0.02953;
+
+/* ---- Requests ---- */
+
+export const createAQIRequest = (lat: number, long: number) => {
+  return new URLSearchParams({
+      'latitude': `${lat}`,
+      'longitude': `${long}`,
+  'timezone': 'auto',
+  'forecast_hours': '12',
+  'current': 'us_aqi,uv_index',
+  'hourly': 'us_aqi,uv_index', 
+  }).toString();
+};
+
+export const createWeatherRequest = (lat: number, long: number) => {
+	return new URLSearchParams({
+		'latitude': `${lat}`,
+		'longitude': `${long}`,
+		'timezone': 'auto',
+		'forecast_days': '7',
+		'forecast_hours': '12',
+		'current': [
+			'temperature_2m',
+			'apparent_temperature',
+			'relative_humidity_2m',
+			'surface_pressure', 
+			'wind_gusts_10m',
+			'precipitation',
+			'weather_code',
+		].join(','),
+		'hourly': [
+			'temperature_2m',
+			'apparent_temperature',
+			'wind_gusts_10m',
+			'weather_code',
+		].join(','),
+		'daily': [
+			'temperature_2m_max',
+			'temperature_2m_min',
+			'weather_code',
+		].join(',')
+	}).toString();
+};
+
+/* ---- Data Transformer ---- */
+
+export const structureWeatherData = (
+	city: string, 
+	country: string, 
+	{ current, daily, hourly }: WeatherResponse,
+	aqiData: AQIResponse
+): WeatherData => {
+		
+	return {
+		city: city,
+		country: country,
+		current: {
+			temp: {
+				'cel': Math.ceil(current.temperature_2m),
+				'feh': toFehrenheit(current.temperature_2m), 
+			},
+			feels_like: {
+				'cel': Math.ceil(current.apparent_temperature),
+				'feh': toFehrenheit(current.apparent_temperature),
+			},
+			humidity: current.relative_humidity_2m,
+			precipitation: {
+				'mm': current.precipitation,
+				'in': toInches(current.precipitation),
+			},
+			wind_gusts: {
+				'kmh': Math.round(current.wind_gusts_10m),
+				'mph': toMph(current.wind_gusts_10m),
+			},
+			pressure: {
+				'hPa': Math.round(current.surface_pressure),
+				'inHg': toIofM(current.surface_pressure),
+			},
+			aqi: aqiData.current.us_aqi,
+			uv_index: Math.round(aqiData.current.uv_index),
+			weather_code: current.weather_code,
+		},
+		daily: daily.time.map((time, idx) => ({
+			time: time,
+			day: new Date(time).toLocaleDateString('en-US', { weekday: 'short' }),
+			temp_max: {
+				'cel': Math.ceil(daily.temperature_2m_max[idx]),
+				'feh': toFehrenheit(daily.temperature_2m_max[idx])
+			},
+			temp_min: {
+				'cel': Math.ceil(daily.temperature_2m_min[idx]),
+				'feh': toFehrenheit(daily.temperature_2m_min[idx]),
+			},
+			weather_code: daily.weather_code[idx],
+		})),
+		hourly: hourly.time.map((time, idx) => ({
+			time: time,
+			temp: {
+				'cel': Math.ceil(hourly.temperature_2m[idx]),
+				'feh': toFehrenheit(hourly.temperature_2m[idx]),
+			},
+			feels_like: {
+				'cel': Math.ceil(hourly.apparent_temperature[idx]),
+				'feh': toFehrenheit(hourly.apparent_temperature[idx]),
+			},
+			wind_gusts: {
+				'kmh': Math.round(hourly.wind_gusts_10m[idx]),
+				'mph': toMph(hourly.wind_gusts_10m[idx]),
+			},
+			aqi: aqiData.hourly.us_aqi[idx],
+			uv_index: Math.round(aqiData.hourly.uv_index[idx]),
+			weather_code: hourly.weather_code[idx],
+		})),
+	};
+};
