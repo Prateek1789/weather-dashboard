@@ -4,12 +4,17 @@ import type {
 	WeatherData
  } from "@/types/weather.types";
 
+export interface AQIDictinoary {
+	keyword: string;
+	description: string;
+};
+
 /* ---- Formatters ---- */
 
 export const toFehrenheit = (c: number) => Math.round((c * 1.8) + 32);
 export const toMph = (k: number) => Math.round(k * 0.621371);
 export const toInches = (mm: number) => Math.round(mm / 25.4);
-export const toIofM = (num: number) => num * 0.02953;
+export const toIofM = (num: number) => Number((num * 0.02953).toFixed(2));
 
 /* ---- Requests ---- */
 
@@ -50,6 +55,8 @@ export const createWeatherRequest = (lat: number, long: number) => {
 			'temperature_2m_max',
 			'temperature_2m_min',
 			'weather_code',
+			'sunrise',
+			'sunset'
 		].join(',')
 	}).toString();
 };
@@ -95,6 +102,8 @@ export const structureWeatherData = (
 		daily: daily.time.map((time, idx) => ({
 			time: time,
 			day: new Date(time).toLocaleDateString('en-US', { weekday: 'short' }),
+			sunrise: daily.sunrise[idx],
+			sunset: daily.sunset[idx],
 			temp_max: {
 				'cel': Math.ceil(daily.temperature_2m_max[idx]),
 				'feh': toFehrenheit(daily.temperature_2m_max[idx])
@@ -123,5 +132,42 @@ export const structureWeatherData = (
 			uv_index: Math.round(aqiData.hourly.uv_index[idx]),
 			weather_code: hourly.weather_code[idx],
 		})),
+	};
+};
+
+export const createAQIDictionary = (value: number): AQIDictinoary => {
+	if (value <= 50) {
+		return { 
+			keyword: 'Good', 
+			description: 'Clean air. No health risks for anyone.' 
+		};
+	}
+	else if (value > 50 && value <= 100) {
+		return { 
+			keyword: 'Satisfactory', 
+			description: 'Generally safe, might affect highly sensitive people.'
+		};
+	}
+	else if (value > 100 && value <= 150) {
+		return { 
+			keyword: 'Sensitive', 
+			description: 'Unsafe for vulnerable groups of people.' 
+		};
+	}
+	else if (value > 150 && value <= 200) {
+		return { 
+			keyword: 'Unhealthy', 
+			description: 'Unhealthy for everyone. Reduce outdoor activities.' 
+		};
+	}
+	else if (value > 200 && value <= 300) {
+		return { 
+			keyword: 'Injurious', 
+			description: 'Health alert, stay indoors and keep windows closed.' 
+		};
+	}
+	else return { 
+		keyword: 'Hazardous', 
+		description: 'Emergency conditions, avoid all outdoor activities.' 
 	};
 };
