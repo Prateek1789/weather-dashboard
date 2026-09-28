@@ -56,6 +56,8 @@ export interface RawCurrent {
 
 export interface RawDaily {
   time: string[];
+  sunrise: string[];
+  sunset: string[];
   weather_code: number[];
   temperature_2m_min: number[];
   temperature_2m_max: number[];
@@ -90,6 +92,8 @@ export interface StructuredCurrent {
 export interface StructuredDaily {
   time: string;
   day: string;
+  sunrise: string;
+  sunset: string;
   temp_min: Temperature;
   temp_max: Temperature;
   weather_code: number;
