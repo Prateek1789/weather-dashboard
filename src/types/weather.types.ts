@@ -49,6 +49,7 @@ export interface RawCurrent {
   apparent_temperature: number;
   precipitation: number;
   relative_humidity_2m: number;
+  dew_point_2m: number;
   wind_gusts_10m: number;
 	surface_pressure: number,
   weather_code: number;
@@ -82,6 +83,7 @@ export interface StructuredCurrent {
   feels_like: Temperature;
   precipitation: Length;
   humidity: number;
+  dew_point: Temperature;
   wind_gusts: Speed;
   aqi: number,
   uv_index: number
