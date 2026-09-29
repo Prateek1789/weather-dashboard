@@ -20,12 +20,12 @@ export const toIofM = (num: number) => Number((num * 0.02953).toFixed(2));
 
 export const createAQIRequest = (lat: number, long: number) => {
   return new URLSearchParams({
-      'latitude': `${lat}`,
-      'longitude': `${long}`,
-  'timezone': 'auto',
-  'forecast_hours': '12',
-  'current': 'us_aqi,uv_index',
-  'hourly': 'us_aqi,uv_index', 
+		'latitude': `${lat}`,
+    'longitude': `${long}`,
+  	'timezone': 'auto',
+  	'forecast_hours': '12',
+  	'current': 'us_aqi,uv_index',
+  	'hourly': 'us_aqi,uv_index', 
   }).toString();
 };
 
@@ -40,6 +40,7 @@ export const createWeatherRequest = (lat: number, long: number) => {
 			'temperature_2m',
 			'apparent_temperature',
 			'relative_humidity_2m',
+			'dew_point_2m',
 			'surface_pressure', 
 			'wind_gusts_10m',
 			'precipitation',
@@ -83,6 +84,10 @@ export const structureWeatherData = (
 				'feh': toFehrenheit(current.apparent_temperature),
 			},
 			humidity: current.relative_humidity_2m,
+			dew_point: {
+				'cel': Math.ceil(current.dew_point_2m),
+				'feh': toFehrenheit(current.dew_point_2m),
+			},
 			precipitation: {
 				'mm': current.precipitation,
 				'in': toInches(current.precipitation),
