@@ -51,6 +51,8 @@ export interface RawCurrent {
   relative_humidity_2m: number;
   dew_point_2m: number;
   wind_gusts_10m: number;
+  wind_speed_10m: number;
+  wind_direction_10m: number;
 	surface_pressure: number,
   weather_code: number;
 };
@@ -69,6 +71,8 @@ export interface RawHourly {
   temperature_2m: number[];
   apparent_temperature: number[];
   wind_gusts_10m: number[];
+  wind_speed_10m: number[];
+  wind_direction_10m: number[];
   weather_code: number[];
 };
 
@@ -85,6 +89,8 @@ export interface StructuredCurrent {
   humidity: number;
   dew_point: Temperature;
   wind_gusts: Speed;
+  wind_speed: Speed;
+  wind_direction: number;
   aqi: number,
   uv_index: number
   pressure: Preassure;
@@ -106,6 +112,8 @@ export interface StructuredHourly {
   temp: Temperature;
   feels_like: Temperature;
   wind_gusts: Speed;
+  wind_speed: Speed;
+  wind_direction: number;
 	aqi: number;
 	uv_index: number;
   weather_code: number;
@@ -118,7 +126,3 @@ export interface WeatherData {
   daily: StructuredDaily[];
   hourly: StructuredHourly[];
 };
-
-/* export interface GroupedHourly {
-    [key: string]: StructuredHourly[];
-}; */
