@@ -17,7 +17,7 @@ const AQICard = () => {
 	const percentage = Math.min(Math.max((aqi / 5), 0), 100);
 
 	return (
-		<Card className="flex-col justify-between shrink-0 p-5 bg-transparent">
+		<Card className="flex-col justify-between shrink-0 p-4 xl:p-5 bg-transparent">
 			<CardHeader className="w-full p-0 flex items-center justify-between text-neutral-400">
 				<CardTitle className="text-xs uppercase tracking-widest">Air Quality</CardTitle>
 				<Wind size={18} aria-hidden />
