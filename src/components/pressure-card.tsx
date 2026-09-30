@@ -22,7 +22,7 @@ const PressureCard = () => {
 	const strokeDashoffset = pathLength - (percentage * pathLength);
 
 	return (
-		<Card className="p-5 flex-col justify-between bg-transparent">
+		<Card className="p-4 xl:p-5 flex-col justify-between bg-transparent">
 			<CardHeader className="w-full p-0 flex items-center justify-between text-neutral-400">
 				<CardTitle className="text-xs tracking-widest uppercase">Pressure</CardTitle>
         <Gauge size={18} aria-hidden />
