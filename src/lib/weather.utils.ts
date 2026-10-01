@@ -226,3 +226,34 @@ export const createAQIDictionary = (value: number): AQIDictinoary => {
 		description: 'Emergency conditions, avoid all outdoor activities.' 
 	};
 };
+
+export const getUVIndexInfo = (value: number) => {
+	if (value <= 2) {
+		return {
+			label: 'Low',
+			advice: 'Safe to stay outside. Wear sunglasses on bright days.', 
+		};
+	}
+	else if (value <= 5) {
+		return {
+			label: 'Moderate',
+			advice: 'Apply sunscreen SPF15+. Seek shade around midday.',
+		};
+	}
+	else if (value <= 7) {
+		return {
+			label: 'High',
+			advice: 'Reduce sun exposure between 10 AM and 4 PM.'
+		};
+	}
+	else if (value <= 10) {
+		return {
+			label: 'Very High',
+			advice: 'Minimize sun exposure. Apply SPF30+ every 2 hours. Wear protective clothing.',
+		};
+	}
+	else return {
+		label: 'Extreme',
+		advice: 'Avoid outdoor exposure during midday. Protective clothing is mandatory.' 
+	};
+};
