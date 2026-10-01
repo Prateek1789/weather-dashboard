@@ -14,14 +14,14 @@ const SunCycleCard = () => {
 	const sunrise = new Date(weatherData?.daily[0].sunrise || '').toLocaleTimeString(
 		'en-us', 
 		{ hour: 'numeric', minute: '2-digit', hour12: true }
-	);
+	) || '';
 	const sunset = new Date(weatherData?.daily[0].sunset || '').toLocaleTimeString(
 		'en-US',
 		{ hour: 'numeric', minute: '2-digit', hour12: true }
-	);
+	) || '';
 
 	return (
-		<Card className="w-full h-full p-4 xl:p-5 bg-transparent">
+		<Card className="w-full h-full p-4 xl:p-5 bg-gray-50 dark:bg-card">
 			<CardHeader className="w-full p-0 flex items-center justify-between text-neutral-400">
 				<CardTitle className="uppercase tracking-widest text-xs">Sun Cycle</CardTitle>
 			</CardHeader>
@@ -40,11 +40,11 @@ const SunCycleCard = () => {
         	</svg>
 					<div className="w-full flex items-baseline justify-between">
 						<div className="flex flex-col gap-1 item-start">
-							<Sunrise size={14} aria-hidden />
+							<Sunrise size={14} color="oklch(70.8% 0 none)" aria-hidden />
 							<span className="uppercase">{sunrise}</span>
 						</div>
 						<div className="flex flex-col gap-1 items-end">
-							<Sunset size={14} aria-hidden />
+							<Sunset size={14} color="oklch(70.8% 0 none)" aria-hidden />
 							<span className="uppercase">{sunset}</span>
 						</div>
 					</div>
