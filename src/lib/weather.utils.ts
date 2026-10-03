@@ -102,6 +102,7 @@ export const createWeatherRequest = (lat: number, long: number) => {
 			'wind_direction_10m',
 			'precipitation',
 			'weather_code',
+			'is_day',
 		].join(','),
 		'hourly': [
 			'temperature_2m',
@@ -167,6 +168,7 @@ export const structureWeatherData = (
 			aqi: aqiData.current.us_aqi,
 			uv_index: Math.round(aqiData.current.uv_index),
 			weather_code: current.weather_code,
+			is_day: current.is_day
 		},
 		daily: daily.time.map((time, idx) => ({
 			time: time,
