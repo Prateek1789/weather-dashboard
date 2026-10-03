@@ -55,6 +55,7 @@ export interface RawCurrent {
   wind_direction_10m: number;
 	pressure_msl: number,
   weather_code: number;
+  is_day: number;
 };
 
 export interface RawDaily {
@@ -95,6 +96,7 @@ export interface StructuredCurrent {
   uv_index: number
   pressure: Preassure;
   weather_code: number;
+  is_day: number;
 };
 
 export interface StructuredDaily {
