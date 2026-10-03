@@ -1,3 +1,18 @@
+import { 
+  Sun, 
+  Moon, 
+  CloudSun, 
+  CloudMoon, 
+  Cloud, 
+  CloudFog, 
+  CloudDrizzle, 
+  CloudRain, 
+  CloudSnow, 
+  CloudLightning, 
+  CloudHail
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
 import type { 
 	AQIResponse,
 	WeatherResponse,
@@ -9,40 +24,44 @@ export interface AQIDictinoary {
 	description: string;
 };
 
-export type WeatherDictionaryType = {
-	[key: number]: string;
+export type WeatherCondition = {
+  day: LucideIcon;
+  night: LucideIcon;
+  label: string;
 };
 
-export const WEATHER_DICTIONARY: WeatherDictionaryType = {
-	0: "Clear sky",
-	1: "Mainly clear",
-	2: "Partly cloudy",
-	3: "Overcast",
-	45: "Fog",
-	48: "Depositing rime fog",
-	51: "Light drizzle",
-	53: "Moderate drizzle",
-	55: "Dense drizzle",
-	56: "Light freezing drizzle",
-	57: "Dense freezing drizzle",
-	61: "Slight rain",
-	63: "Moderate rain",
-	65: "Heavy rain",
-	66: "Light freezing rain",
-	67: "Heavy freezing rain",
-	71: "Slight snowfall",
-	73: "Moderate snowfall",
-	75: "Heavy snowfall",
-	77: "Snow grains",
-	80: "Slight rain showers",
-	81: "Moderate rain showers",
-	82: "Violent rain showers",
-	85: "Slight snow showers",
-	86: "Heavy snow showers",
-	95: "Thunderstorm",
-	96: "Thunderstorm with slight hail",
-	97: "Heavy thunderstorm",
-	99: "Thunderstorm with heavy hail"
+/* ---- A Weather Map which uses Open Meteos weather code to provide label and icon  ---- */
+
+export const WEATHER_CONDITION_MAP: Record<number, WeatherCondition> = {
+		0: { day: Sun, night: Moon, label: "Clear sky" },
+		1: { day: Sun, night: Moon, label: "Mainly clear" },
+		2: { day: CloudSun, night: CloudMoon, label: "Partly cloudy" },
+		3: { day: Cloud, night: Cloud, label: "Overcast" },
+		45: { day: CloudFog, night: CloudFog, label: "Fog" },
+		48: { day: CloudFog, night: CloudFog, label: "Depositing rime fog" },
+		51: { day: CloudDrizzle, night: CloudDrizzle, label: "Light drizzle" },
+		53: { day: CloudDrizzle, night: CloudDrizzle, label: "Moderate drizzle" },
+		55: { day: CloudDrizzle, night: CloudDrizzle, label: "Dense drizzle" },
+		56: { day: CloudSnow, night: CloudSnow, label: "Light freezing drizzle" },
+		57: { day: CloudSnow, night: CloudSnow, label: "Dense freezing drizzle" },
+		61: { day: CloudRain, night: CloudRain, label: "Slight rain" },
+		63: { day: CloudRain, night: CloudRain, label: "Moderate rain" },
+		65: { day: CloudRain, night: CloudRain, label: "Heavy rain" },
+		66: { day: CloudSnow, night: CloudSnow, label: "Light freezing rain" },
+		67: { day: CloudSnow, night: CloudSnow, label: "Heavy freezing rain" },
+		71: { day: CloudSnow, night: CloudSnow, label: "Slight snowfall" },
+		73: { day: CloudSnow, night: CloudSnow, label: "Moderate snowfall" },
+		75: { day: CloudSnow, night: CloudSnow, label: "Heavy snowfall" },
+		77: { day: CloudSnow, night: CloudSnow, label: "Snow grains" },
+		80: { day: CloudRain, night: CloudRain, label: "Slight rain showers" },
+		81: { day: CloudRain, night: CloudRain, label: "Moderate rain showers" },
+		82: { day: CloudRain, night: CloudRain, label: "Violent rain showers" },
+		85: { day: CloudSnow, night: CloudSnow, label: "Slight snow showers" },
+		86: { day: CloudSnow, night: CloudSnow, label: "Heavy snow showers" },
+		95: { day: CloudLightning, night: CloudLightning, label: "Thunderstorm" },
+		96: { day: CloudHail, night: CloudHail, label: "Thunderstorm with slight hail" },
+		97: { day: CloudLightning, night: CloudLightning, label: "Heavy thunderstorm" },
+		99: { day: CloudHail, night: CloudHail, label: "Thunderstorm with heavy hail" }
 };
 
 /* ---- Formatters ---- */
