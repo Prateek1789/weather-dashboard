@@ -65,6 +65,8 @@ export interface RawDaily {
   weather_code: number[];
   temperature_2m_min: number[];
   temperature_2m_max: number[];
+  precipitation_sum: number[];
+  precipitation_probability_max: number[];
 };
 
 export interface RawHourly {
@@ -75,6 +77,8 @@ export interface RawHourly {
   wind_speed_10m: number[];
   wind_direction_10m: number[];
   weather_code: number[];
+  precipitation: number[];
+  precipitation_probability: number[];
 };
 
 export interface WeatherResponse {
@@ -107,6 +111,8 @@ export interface StructuredDaily {
   temp_min: Temperature;
   temp_max: Temperature;
   weather_code: number;
+  precipitation_sum: number;
+  precipitation_probability: number;
 };
 
 export interface StructuredHourly {
@@ -119,6 +125,8 @@ export interface StructuredHourly {
 	aqi: number;
 	uv_index: number;
   weather_code: number;
+  precipitation: number;
+  precipitation_probability: number;
 };
 
 export interface WeatherData {
