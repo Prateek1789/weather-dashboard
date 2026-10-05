@@ -110,14 +110,18 @@ export const createWeatherRequest = (lat: number, long: number) => {
 			'wind_gusts_10m',
 			'wind_speed_10m',
 			'wind_direction_10m',
+			'precipitation',
+			'precipitation_probability',
 			'weather_code',
 		].join(','),
 		'daily': [
 			'temperature_2m_max',
 			'temperature_2m_min',
-			'weather_code',
 			'sunrise',
-			'sunset'
+			'sunset',
+			'precipitation_sum',
+			'precipitation_probability_max',
+			'weather_code',
 		].join(',')
 	}).toString();
 };
@@ -183,6 +187,8 @@ export const structureWeatherData = (
 				'cel': Math.ceil(daily.temperature_2m_min[idx]),
 				'feh': toFehrenheit(daily.temperature_2m_min[idx]),
 			},
+			precipitation_sum: daily.precipitation_sum[idx],
+			precipitation_probability: daily.precipitation_probability_max[idx],
 			weather_code: daily.weather_code[idx],
 		})),
 		hourly: hourly.time.map((time, idx) => ({
@@ -206,6 +212,8 @@ export const structureWeatherData = (
 			wind_direction: hourly.wind_direction_10m[idx],
 			aqi: aqiData.hourly.us_aqi[idx],
 			uv_index: Math.round(aqiData.hourly.uv_index[idx]),
+			precipitation: hourly.precipitation[idx],
+			precipitation_probability: hourly.precipitation_probability[idx],
 			weather_code: hourly.weather_code[idx],
 		})),
 	};
