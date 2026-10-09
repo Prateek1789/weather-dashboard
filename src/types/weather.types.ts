@@ -111,7 +111,7 @@ export interface StructuredDaily {
   temp_min: Temperature;
   temp_max: Temperature;
   weather_code: number;
-  precipitation_sum: number;
+  precipitation_sum: Length;
   precipitation_probability: number;
 };
 
@@ -125,7 +125,7 @@ export interface StructuredHourly {
 	aqi: number;
 	uv_index: number;
   weather_code: number;
-  precipitation: number;
+  precipitation: Length;
   precipitation_probability: number;
 };
 
