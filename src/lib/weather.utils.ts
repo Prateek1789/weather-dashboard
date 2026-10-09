@@ -1,3 +1,8 @@
+import type { 
+	StructuredDaily, 
+	StructuredHourly 
+} from "@/types/weather.types";
+
 import { 
   Sun, 
   Moon, 
@@ -187,7 +192,10 @@ export const structureWeatherData = (
 				'cel': Math.ceil(daily.temperature_2m_min[idx]),
 				'feh': toFehrenheit(daily.temperature_2m_min[idx]),
 			},
-			precipitation_sum: daily.precipitation_sum[idx],
+			precipitation_sum: {
+				'mm': daily.precipitation_sum[idx],
+				'in': toInches(daily.precipitation_sum[idx]),
+			},
 			precipitation_probability: daily.precipitation_probability_max[idx],
 			weather_code: daily.weather_code[idx],
 		})),
@@ -212,7 +220,10 @@ export const structureWeatherData = (
 			wind_direction: hourly.wind_direction_10m[idx],
 			aqi: aqiData.hourly.us_aqi[idx],
 			uv_index: Math.round(aqiData.hourly.uv_index[idx]),
-			precipitation: hourly.precipitation[idx],
+			precipitation: {
+				'mm': hourly.precipitation[idx],
+				'in': toInches(hourly.precipitation[idx]),
+			},
 			precipitation_probability: hourly.precipitation_probability[idx],
 			weather_code: hourly.weather_code[idx],
 		})),
@@ -285,4 +296,43 @@ export const getUVIndexInfo = (value: number) => {
 		label: 'Extreme',
 		advice: 'Avoid outdoor exposure during midday. Protective clothing is mandatory.' 
 	};
+};
+
+type PrecipitationSummaryArgs = {
+	daily: StructuredDaily[];
+	hourly: StructuredHourly[];
+	unit: 'mm' | 'in';
+}
+
+export const getPrecipitationSummary = ({
+	daily,
+	hourly,
+	unit
+}: PrecipitationSummaryArgs) => {
+	const rainyHours = hourly.filter(hour => hour.precipitation_probability > 0.20);
+	const rainyDays = daily.filter(day => day.precipitation_probability > 0.30);
+
+	if (rainyHours.length > 0) {
+		if (rainyHours.length === 1) {
+			const time = new Date(rainyHours[0].time).toLocaleTimeString('en-us', { hour: 'numeric' });
+			const amount = rainyHours[0].precipitation[unit];
+			return `Next expected is ${amount < 1 ? `<1 ${unit}` : `${amount} ${unit}`} around ${time}`;
+		}
+		else if (rainyHours.length > 6) {
+			return 'Rain is expected throughout most of the next 12 hours';
+		}
+		else {
+			const firstRain = new Date(rainyHours[0].time).toLocaleTimeString('en-us', { hour: 'numeric' });
+			const lastRain = new Date(rainyHours[rainyHours.length - 1].time).toLocaleTimeString('en-us', { hour: 'numeric' });
+			return `Rain is expected between ${firstRain} and ${lastRain}`;
+		};
+	};
+
+	if (rainyDays.length > 0) {
+		const nextRainDay = new Date(rainyDays[0].time).toLocaleDateString('en-us', { weekday: 'long' });
+		const amount = rainyDays[0].precipitation_sum[unit];
+		return `Next expected is ${amount < 1 ? `<1${unit}` : `${amount} ${unit}`} on ${nextRainDay}`;
+	};
+
+	return 'No rain expected for next 7 days';
 };
