@@ -26,7 +26,7 @@ const PrecipitationCard = () => {
 				<CardTitle className="uppercase tracking-widest text-xs">Precipitation</CardTitle>
 				<CloudRain size={18} aria-hidden />
 			</CardHeader>
-			<CardContent className="w-full h-full flex-col items-end p-0">
+			<CardContent className="w-full h-full flex flex-col justify-end p-0">
 				{ weatherData && (
 					<>
 						<div className="flex items-baseline gap-1">
