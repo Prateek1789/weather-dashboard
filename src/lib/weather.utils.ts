@@ -267,35 +267,51 @@ export const createAQIDictionary = (value: number): AQIDictinoary => {
 	};
 };
 
-export const getUVIndexInfo = (value: number) => {
-	if (value <= 2) {
+type UVIndexInfoArgs = {
+	isDay: number;
+	value: number;
+};
+
+export const getUVIndexInfo = ({
+	isDay,
+	value
+}: UVIndexInfoArgs): { label: string, advice: string } => {
+	if (!isDay) {
 		return {
 			label: 'Low',
-			advice: 'Safe to stay outside. Wear sunglasses on bright days.', 
+			advice: 'Low for the rest of the day',
 		};
 	}
-	else if (value <= 5) {
-		return {
-			label: 'Moderate',
-			advice: 'Apply sunscreen SPF15+. Seek shade around midday.',
+	else {
+		if (value <= 2) {
+			return {
+				label: 'Low',
+				advice: 'Safe to stay outside. Wear sunglasses on bright days.', 
+			};
+		}
+		else if (value <= 5) {
+			return {
+				label: 'Moderate',
+				advice: 'Apply sunscreen SPF15+. Seek shade around midday.',
+			};
+		}
+		else if (value <= 7) {
+			return {
+				label: 'High',
+				advice: 'Reduce sun exposure between 10 AM and 4 PM.'
+			};
+		}
+		else if (value <= 10) {
+			return {
+				label: 'Very High',
+				advice: 'Minimize sun exposure. Apply SPF30+ every 2 hours. Wear protective clothing.',
+			};
+		}
+		else return {
+			label: 'Extreme',
+			advice: 'Avoid outdoor exposure during midday. Protective clothing is mandatory.' 
 		};
 	}
-	else if (value <= 7) {
-		return {
-			label: 'High',
-			advice: 'Reduce sun exposure between 10 AM and 4 PM.'
-		};
-	}
-	else if (value <= 10) {
-		return {
-			label: 'Very High',
-			advice: 'Minimize sun exposure. Apply SPF30+ every 2 hours. Wear protective clothing.',
-		};
-	}
-	else return {
-		label: 'Extreme',
-		advice: 'Avoid outdoor exposure during midday. Protective clothing is mandatory.' 
-	};
 };
 
 type PrecipitationSummaryArgs = {
