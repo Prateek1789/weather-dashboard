@@ -13,9 +13,10 @@ import { SunMedium } from "lucide-react";
 
 const UVIndexCard = () => {
 	const weatherData = useWeatherStore(state => state.weatherData);
+	const isDay = weatherData?.current.is_day || 0;
 	const uvIndex = weatherData?.current.uv_index || 0;
 	const percentage = Math.min(Math.max((uvIndex * 10), 0), 100);
-	const uvInfo = getUVIndexInfo(uvIndex);
+	const uvInfo = getUVIndexInfo({ isDay, value: uvIndex });
 
 	return (
 		<Card className="p-4 xl:p-5 flex-col justify-between bg-gray-50 dark:bg-card">
