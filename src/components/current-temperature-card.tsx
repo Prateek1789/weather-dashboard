@@ -43,7 +43,7 @@ const CurrentTempCard = () => {
 						<div className="w-full h-full p-0 flex items-end justify-between">
 							<h3 className="text-8xl">{weatherData?.current.temp[unit]}°</h3>
 							<div className="flex items-center gap-2">
-								<WeatherIcon code={weatherData?.current.weather_code} isDay={Boolean(weatherData.current.is_day)} size={24} /> 
+								<WeatherIcon code={weatherData.current.weather_code} isDay={Boolean(weatherData.current.is_day)} size={24} /> 
 								<p className="text-lg capitalize">
 								{WEATHER_CONDITION_MAP[weatherData.current.weather_code].label}
 								</p>
