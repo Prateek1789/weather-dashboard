@@ -15,6 +15,7 @@ const Searchbar = () => {
 	const geoError = useWeatherStore(state => state.geoDataError);
 	const isGeoDataLoading = useWeatherStore(state => state.isGeoDataLoading);
 	const clearGeoError = useWeatherStore(state => state.clearGeoError);
+	const getWeatherData = useWeatherStore(state => state.getWeatherData);
 
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const inputRef = useRef<HTMLInputElement | null>(null);
@@ -53,7 +54,17 @@ const Searchbar = () => {
 					setQuery(geoData[activeIndex].name);
 					setActiveIndex(-1);
 					setIsOpen(false);
-				}
+
+					getWeatherData({
+						id: geoData[activeIndex].id,
+						city: geoData[activeIndex].name,
+						country: geoData[activeIndex].country,
+						latitude: geoData[activeIndex].latitude,
+						longitude: geoData[activeIndex].longitude
+					});
+
+					inputRef.current?.blur();
+				};
 				break;
 			
 			case 'Escape':
@@ -99,10 +110,10 @@ const Searchbar = () => {
   return (
     <div 
 			ref={containerRef}
-			className="w-full max-w-sm relative"
+			className="w-full relative"
 		>
       <label 
-        className="w-full max-w-sm p-1 px-2 rounded-lg flex items-center justify-center gap-1.5 border border-neutral-200 has-focus:border-neutral-400 has-focus:outline-3 has-focus:outline-neutral-300 dark:border-neutral-600 dark:outline-neutral-700"
+        className="w-full py-1 px-2.5 rounded-xl flex items-center justify-center gap-1.5 border border-neutral-200 has-focus:border-neutral-400 has-focus:outline-3 has-focus:outline-neutral-300 dark:border-neutral-700/60 dark:outline-neutral-700"
       >
 				<span className="sr-only">Search for a city</span>
         <SearchIcon size={18} />
@@ -127,7 +138,7 @@ const Searchbar = () => {
 
 			{ isOpen && (
 				<div 
-					className="w-full h-auto p-1 bg-card top-[120%] left-0 absolute flex flex-col shadow-lg rounded-lg border border-neutral-200 dark:border-neutral-700"
+					className="w-full h-auto p-1 bg-card top-[120%] left-0 absolute z-50 flex flex-col shadow-lg rounded-xl border border-neutral-200 dark:border-neutral-700"
 				>
 				
 				{ isGeoDataLoading && (
@@ -146,7 +157,7 @@ const Searchbar = () => {
 					<ul 
 						id="suggestion-list"
 						role="listbox"
-						className="w-full flex flex-col gap-1 rounded-lg"
+						className="w-full flex flex-col gap-1 rounded-xl"
 					>
 						{ geoData.map((itm, idx) => {
 							return (
@@ -156,6 +167,13 @@ const Searchbar = () => {
 									role="option"
 									aria-selected={idx === activeIndex}
 									onClick={() => {
+										getWeatherData({
+											id: itm.id,
+											city: itm.name,
+											country: itm.country,
+											longitude: itm.longitude,
+											latitude: itm.latitude
+										});
 										skipFetchRef.current = true;
 										setQuery(itm.name);
 										setIsOpen(false);
@@ -163,7 +181,7 @@ const Searchbar = () => {
 									}}
 									onMouseOver={() => setActiveIndex(idx)}
 									onMouseLeave={() => setActiveIndex(-1)}
-									className={`w-full py-1 px-1.5 flex items-center capitalize justify-start gap-1.5 rounded-sm cursor-pointer ${idx === activeIndex ? 'bg-neutral-300/50 dark:bg-neutral-700' : ''}`}
+									className={`w-full py-1 px-1.5 flex items-center capitalize justify-start gap-1.5 rounded-lg cursor-pointer ${idx === activeIndex ? 'bg-neutral-300/50 dark:bg-neutral-700' : ''}`}
 								>
 									{`${itm.name}, ${itm.admin1}, ${itm.country}`}
 								</li>
