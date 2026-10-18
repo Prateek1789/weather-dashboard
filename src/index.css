@@ -142,8 +142,4 @@
   justify-content: center;
   gap: 1rem;
   padding: 1rem;
-
-  @media (min-width: 48rem) {
-    gap: 1rem
-  }
 }
